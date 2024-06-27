@@ -31,7 +31,7 @@ fatal() {
 }
 
 remoteExec() {
-    sshpass -p "$routerPass" ssh -o StrictHostKeyChecking=no "$routerUser"@"$routerIP" <<-EOF
+    sshpass -p "$routerPass" ssh -o StrictHostKeyChecking=no "$routerUser"@"$routerIP" 2> /dev/null <<-EOF
 	$1
 	EOF
 }
@@ -65,7 +65,7 @@ while true; do
     case $menu in
         1)  
             checkVariables 
-            dialog --msgbox "$(remoteExec "/nat/virtual-servers/show" | tail -n +11 | head -n -3)" 0 0
+            dialog --msgbox "$(remoteExec "/nat/virtual-servers/show" | tail -n +11 | head -n -3) " 0 0
             ;;
         2)
             checkVariables "jellyfinIP"
