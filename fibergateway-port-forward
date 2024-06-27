@@ -65,7 +65,7 @@ while true; do
     case $menu in
         1)  
             checkVariables 
-            remoteExec "/nat/virtual-servers/show"
+            dialog --msgbox $(remoteExec "/nat/virtual-servers/show") 0 0
             ;;
         2)
             checkVariables "jellyfinIP"
