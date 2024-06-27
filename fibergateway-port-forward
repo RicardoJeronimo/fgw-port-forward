@@ -31,8 +31,12 @@ fatal() {
 }
 
 remoteExec() {
+    rules=("$@")
+
     sshpass -p "$routerPass" ssh -o StrictHostKeyChecking=no "$routerUser"@"$routerIP" 2> /dev/null <<-EOF
-	$1
+	$(for rule in "${rules[@]}"; do
+		echo "$rule"
+	done)
 	EOF
 }
 
@@ -77,11 +81,11 @@ while true; do
             ;;
         4)
             checkVariables "playstation5IP"
-            dialog --msgbox "$(remoteExec "/nat/virtual-servers/create --server-name=PlayStation5 --server-ip=$playstation5IP --protocol=UDP --ext-port-start=9302 --int-port-start=9302 --wan-intf=erouter0\n/nat/virtual-servers/create --server-name=PlayStation5 --server-ip=$playstation5IP --protocol=TCP --ext-port-start=9295 --int-port-start=9295 --wan-intf=erouter0\n/nat/virtual-servers/create --server-name=PlayStation5 --server-ip=$playstation5IP --protocol=UDP --ext-port-start=9295 --ext-port-end=9297 --int-port-start=9295 --int-port-end=9297 --wan-intf=erouter0" | tail -n +11 | head -n 3)" 0 0
+            dialog --msgbox "$(remoteExec "/nat/virtual-servers/create --server-name=PlayStation5 --server-ip=$playstation5IP --protocol=UDP --ext-port-start=9302 --int-port-start=9302 --wan-intf=erouter0" "/nat/virtual-servers/create --server-name=PlayStation5 --server-ip=$playstation5IP --protocol=TCP --ext-port-start=9295 --int-port-start=9295 --wan-intf=erouter0" "/nat/virtual-servers/create --server-name=PlayStation5 --server-ip=$playstation5IP --protocol=UDP --ext-port-start=9295 --ext-port-end=9297 --int-port-start=9295 --int-port-end=9297 --wan-intf=erouter0" | tail -n +11 | head -n 3)" 0 0
             ;;
         5)
             checkVariables "playstation5IP"
-            dialog --msgbox "$(remoteExec "/nat/virtual-servers/remove --server-ip=$playstation5IP --protocol=UDP --ext-port-start=9302 --int-port-start=9302\n/nat/virtual-servers/remove --server-ip=$playstation5IP --protocol=TCP --ext-port-start=9295 --int-port-start=9295\n/nat/virtual-servers/remove --server-ip=$playstation5IP --protocol=UDP --ext-port-start=9295 --ext-port-end=9297 --int-port-start=9295 --int-port-end=9297" | tail -n +11 | head -n 2) 0 0"
+            dialog --msgbox "$(remoteExec "/nat/virtual-servers/remove --server-ip=$playstation5IP --protocol=UDP --ext-port-start=9302 --int-port-start=9302" "/nat/virtual-servers/remove --server-ip=$playstation5IP --protocol=TCP --ext-port-start=9295 --int-port-start=9295" "/nat/virtual-servers/remove --server-ip=$playstation5IP --protocol=UDP --ext-port-start=9295 --ext-port-end=9297 --int-port-start=9295 --int-port-end=9297" | tail -n +11 | head -n 2) 0 0"
             ;;
         6)
             exit
