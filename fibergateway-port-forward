@@ -31,7 +31,7 @@ fatal() {
 }
 
 remoteExec() {
-    sshpass -p "$routerPass" ssh "$routerUser"@"$routerIP" <<-EOF
+    sshpass -p "$routerPass" ssh -o StrictHostKeyChecking=no "$routerUser"@"$routerIP" <<-EOF
 	$1
 	EOF
 }
