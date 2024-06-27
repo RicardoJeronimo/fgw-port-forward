@@ -14,6 +14,17 @@ checkDependencies() {
     fi
 }
 
+checkVariables() {
+    variables=("routerIP" "routerUser" "routerPass")
+    variables+=("$@")
+
+    for var in "${variables[@]}"; do
+        if [ -z "${!var}" ]; then
+            fatal "[ERROR] Variable $var not set."
+        fi
+    done
+}
+
 fatal() {
     echo "$@" >&2
     kill -10 $proc
@@ -30,7 +41,7 @@ routerIP=
 routerUser=
 routerPass=
 jellyfinIP=
-ps5IP=
+playstation5IP=
 
 trap 'exit 1' SIGUSR1
 
@@ -53,19 +64,24 @@ while true; do
 
     case $menu in
         1)  
+            checkVariables 
             remoteExec "/nat/virtual-servers/show"
             ;;
         2)
+            checkVariables "jellyfinIP"
             remoteExec "/nat/virtual-servers/create --server-name=Jellyfin --server-ip=$jellyfinIP --protocol=TCP --ext-port-start=8096 --int-port-start=8096 --wan-intf=erouter0"
             ;;
         3)
+            checkVariables "jellyfinIP"
             remoteExec "/nat/virtual-servers/remove --server-ip=$jellyfinIP --protocol=TCP --ext-port-start=8096 --int-port-start=8096"
             ;;
         4)
-            remoteExec "/nat/virtual-servers/create --server-name=PlayStation5 --server-ip=$ps5IP --protocol=UDP --ext-port-start=9302 --int-port-start=9302 --wan-intf=erouter0\n/nat/virtual-servers/create --server-name=PlayStation5 --server-ip=$ps5IP --protocol=TCP --ext-port-start=9295 --int-port-start=9295 --wan-intf=erouter0\n/nat/virtual-servers/create --server-name=PlayStation5 --server-ip=$ps5IP --protocol=UDP --ext-port-start=9295 --ext-port-end=9297 --int-port-start=9295 --int-port-end=9297 --wan-intf=erouter0"
+            checkVariables "playstation5IP"
+            remoteExec "/nat/virtual-servers/create --server-name=PlayStation5 --server-ip=$playstation5IP --protocol=UDP --ext-port-start=9302 --int-port-start=9302 --wan-intf=erouter0\n/nat/virtual-servers/create --server-name=PlayStation5 --server-ip=$playstation5IP --protocol=TCP --ext-port-start=9295 --int-port-start=9295 --wan-intf=erouter0\n/nat/virtual-servers/create --server-name=PlayStation5 --server-ip=$playstation5IP --protocol=UDP --ext-port-start=9295 --ext-port-end=9297 --int-port-start=9295 --int-port-end=9297 --wan-intf=erouter0"
             ;;
         5)
-            remoteExec "/nat/virtual-servers/remove --server-ip=$ps5IP --protocol=UDP --ext-port-start=9302 --int-port-start=9302\n/nat/virtual-servers/remove --server-ip=$ps5IP --protocol=TCP --ext-port-start=9295 --int-port-start=9295\n/nat/virtual-servers/remove --server-ip=$ps5IP --protocol=UDP --ext-port-start=9295 --ext-port-end=9297 --int-port-start=9295 --int-port-end=9297"
+            checkVariables "playstation5IP"
+            remoteExec "/nat/virtual-servers/remove --server-ip=$playstation5IP --protocol=UDP --ext-port-start=9302 --int-port-start=9302\n/nat/virtual-servers/remove --server-ip=$playstation5IP --protocol=TCP --ext-port-start=9295 --int-port-start=9295\n/nat/virtual-servers/remove --server-ip=$playstation5IP --protocol=UDP --ext-port-start=9295 --ext-port-end=9297 --int-port-start=9295 --int-port-end=9297"
             ;;
         6)
             exit
