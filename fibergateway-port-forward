@@ -16,7 +16,7 @@ checkDependencies() {
 
 
 checkLogin() {
-    sshpass -p "$routerPass" ssh -o StrictHostKeyChecking=no "$routerUser"@"$routerIP" &>/dev/null <<-EOF 
+    sshpass -p "$routerPass" ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no "$routerUser"@"$routerIP" &>/dev/null <<-EOF 
 	EOF
 }
 
@@ -39,15 +39,20 @@ fatal() {
 remoteExec() {
     rules=("$@")
 
-    sshpass -p "$routerPass" ssh -o StrictHostKeyChecking=no "$routerUser"@"$routerIP" 2>&1 <<-EOF
-	$(for rule in "${rules[@]}"; do
-		echo "$rule"
-	done)
-	EOF
+    if sshpass -p "$routerPass" ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no "$routerUser"@"$routerIP" &> execOutput <<-EOF
+		$(for rule in "${rules[@]}"; do
+			echo "$rule"
+		done)
+		EOF
+    then
+        cat $execOutput
+    else
+        cat $execOutput
+    fi
 }
 
 proc=$$
-routerIP=192.168.1.254
+routerIP=
 routerUser=
 routerPass=
 jellyfinIP=
