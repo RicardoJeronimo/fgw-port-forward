@@ -39,15 +39,17 @@ fatal() {
 remoteExec() {
     rules=("$@")
 
-    if sshpass -p "$routerPass" ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no "$routerUser"@"$routerIP" &> execOutput <<-EOF
+    execOutput=$(sshpass -p "$routerPass" ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no "$routerUser"@"$routerIP" 2>/dev/null <<-EOF
 		$(for rule in "${rules[@]}"; do
 			echo "$rule"
 		done)
 		EOF
-    then
-        cat $execOutput
+    )
+
+    if [ -n "$execOutput" ]; then
+        echo "$execOutput"
     else
-        cat $execOutput
+        echo "[ERROR] Something went wrong with sshpass."
     fi
 }
 
